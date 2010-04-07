@@ -5,7 +5,7 @@ class Quacker
   def self.helper_method(*args); end
   def self.hide_action(*args); end
   def memoizable(*args); args; end
-  expose(:proxy)
+  exposes(:proxy)
 end
 
 module ActionController
@@ -31,12 +31,12 @@ end
 
 describe DecentExposure do
   context "classes extending DecentExposure" do
-    it "respond to :expose" do
-      Quacker.respond_to?(:expose).should be_true
+    it "respond to :exposes" do
+      Quacker.respond_to?(:exposes).should be_true
     end
   end
 
-  context "#expose" do
+  context "#exposes" do
     let(:instance){ Quacker.new }
 
     it "creates a method with the given name" do
@@ -46,7 +46,7 @@ describe DecentExposure do
     it "prevents the method from being a callable action" do
       Quacker.expects(:hide_action).with(:blerg)
       Quacker.class_eval do
-        expose(:blerg){ 'ehm' }
+        exposes(:blerg){ 'ehm' }
       end
     end
 
@@ -54,7 +54,7 @@ describe DecentExposure do
       Quacker.stubs(:hide_action)
       Quacker.expects(:helper_method).with(:blarg)
       Quacker.class_eval do
-        expose(:blarg){ 'uhm' }
+        exposes(:blarg){ 'uhm' }
       end
     end
 
@@ -62,7 +62,7 @@ describe DecentExposure do
       Quacker.stubs(:hide_action)
       Quacker.stubs(:helper_method)
       Quacker.class_eval do
-        expose(:quack){ memoizable('quack!') }
+        exposes(:quack){ memoizable('quack!') }
       end
       instance.quack.should == %w(quack!)
     end
@@ -81,7 +81,7 @@ describe DecentExposure do
           def self.hide_action(*args); end
           def params; end
           default_exposure {"default value"}
-          expose(:quack)
+          exposes(:quack)
         end
       end
 
@@ -92,7 +92,7 @@ describe DecentExposure do
       it "passes the name given to #expose into the block" do
         DuckController.class_eval do
           default_exposure {|name| "downy #{name}"}
-          expose :feathers
+          exposes :feathers
         end
         DuckController.new.feathers.should == "downy feathers"
       end
@@ -110,7 +110,7 @@ describe DecentExposure do
     end
 
     it "extends ActionController::Base" do
-      ActionController::Base.respond_to?(:expose).should == true
+      ActionController::Base.respond_to?(:exposes).should == true
     end
 
     context "by default" do
@@ -118,7 +118,7 @@ describe DecentExposure do
         name = resource
         Resource.expects(:find).with(42)
         ActionController::Base.class_eval do
-          expose name
+          exposes name
         end
         controller.resource
       end
@@ -149,7 +149,7 @@ describe DecentExposure do
       Widget.expects(:find).with(123).returns('a widget')
       MyController.class_eval do
         def params; {'id' => 123} end
-        expose name
+        exposes name
       end
 
       my_controller.widget.should == 'a widget'
@@ -158,7 +158,7 @@ describe DecentExposure do
     it "allows overridden default in descendant controllers" do
       MyController.class_eval do
         default_exposure {|name| name.to_s}
-        expose :overridden
+        exposes :overridden
       end
       my_controller.overridden.should == 'overridden'
     end
@@ -167,7 +167,7 @@ describe DecentExposure do
       name = widget
       Widget.stubs(:find).returns('preserved')
       ActionController::Base.class_eval do
-        expose name
+        exposes name
       end
       controller.widget.should == 'preserved'
     end

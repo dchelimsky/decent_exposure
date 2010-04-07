@@ -14,7 +14,7 @@ module DecentExposure
     _default_exposure
   end
 
-  def expose(name, &block)
+  def exposes(name, &block)
     closured_exposure = default_exposure
     define_method name do
       @_resources       ||= {}
@@ -27,5 +27,6 @@ module DecentExposure
     helper_method name
     hide_action name
   end
-  alias let expose
+  alias expose exposes
+  alias let exposes
 end

@@ -25,7 +25,7 @@ In `config/environment.rb`:
 The Particulars
 ---------------
 
-`expose` creates a method with the given name, evaluates the provided block (or
+`exposes` creates a method with the given name, evaluates the provided block (or
 intuits a value when no block is passed) and memoizes the result. This method is
 then declared as a `helper_method` so that views may have access to it and is
 made unroutable as an action.
@@ -35,11 +35,11 @@ Examples
 
 ### In your controllers
 
-When no block is given, `expose` attempts to intuit which resource you want to
+When no block is given, `exposes` attempts to intuit which resource you want to
 acquire:
 
     # Category.find(params[:category_id] || params[:id])
-    expose(:category)
+    exposes(:category)
 
 As the example shows, the symbol passed is used to guess the class name of the
 object you want an instance of. Almost every controller has one of these. In the
@@ -49,7 +49,7 @@ or `#destroy`.
 In the slightly more complicated scenario, you need to find an instance of an
 object which doesn't map cleanly to `Object#find`:
 
-    expose(:product){ category.products.find(params[:id]) }
+    exposes(:product){ category.products.find(params[:id]) }
 
 In the RESTful controller paradigm, you'll again find yourself using this in
 `#show`, `#edit`, `#update` or `#destroy`.
@@ -57,7 +57,7 @@ In the RESTful controller paradigm, you'll again find yourself using this in
 When the code has become complex enough to surpass a single line (and is not
 appropriate to extract into a model method), use the `do...end` style of block:
 
-    expose(:associated_products) do
+    exposes(:associated_products) do
       product.associated.tap do |associated_products|
         present(associated_products, :with => AssociatedProductPresenter)
       end
@@ -78,11 +78,11 @@ other method you might normally have access to:
 
 ### Custom defaults
 
-DecentExposure provides opinionated default logic when `expose` is invoked without
+DecentExposure provides opinionated default logic when `exposes` is invoked without
 a block. It's possible, however, to override this with your own custom default
 logic by passing a block accepting a single argument to the `default_exposure`
 method inside of a controller. The argument will be the string or symbol passed
-in to the `expose` call.
+in to the `exposes` call.
 
     class MyController < ApplicationController
       default_exposure do |name|
@@ -94,7 +94,7 @@ The given block will be invoked in the context of a controller instance. It is
 possible to provide a custom default for a descendant class without disturbing
 its ancestor classes in an inheritance heirachy.
 
-**Caveat**: Note that the simplest way to provide custom default `expose` logic
+**Caveat**: Note that the simplest way to provide custom default `exposes` logic
 for all of your controllers is to invoke `default_exposure` inside of
 `ApplicationController`. Due to the order of Rails' initialization logic,
 attempts to invoke it in `ActionController::Base` will have no affect. Use an
